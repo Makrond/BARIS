@@ -15,7 +15,7 @@ Source code copyright 2018, by Michael Billard (Angel-125)
 License: GNU General Public License Version 3
 License URL: http://www.gnu.org/licenses/
 Wild Blue Industries is trademarked by Michael Billard and may be used for non-commercial purposes. All other rights reserved.
-Note that Wild Blue Industries is a ficticious entity 
+Note that Wild Blue Industries is a ficticious entity
 created for entertainment purposes. It is in no way meant to represent a real entity.
 Any similarity to a real entity is purely coincidental.
 
@@ -54,7 +54,7 @@ namespace WildBlueIndustries
             base.SetVisible(newValue);
             if (!newValue)
             {
-                GamePersistence.SaveGame("persistent", HighLogic.SaveFolder, SaveMode.BACKUP); 
+                GamePersistence.SaveGame("persistent", HighLogic.SaveFolder, SaveMode.BACKUP);
                 return;
             }
 
@@ -82,6 +82,7 @@ namespace WildBlueIndustries
                 bayView.addWorker = canAddWorker;
                 bayView.removeWorker = canRemoveWorker;
                 bayView.returnWorkers = returnWorkers;
+                bayView.maxWorkers = CanMaxWorkers;
                 bayView.closeView = closeView;
                 editorBays.Add(bayView);
                 debugLog("Added Bay: " + index);
@@ -128,6 +129,23 @@ namespace WildBlueIndustries
                 return true;
             }
 
+            return false;
+        }
+
+        protected bool CanMaxWorkers(int currentWorkers, out int newWorkers)
+        {
+            int availableWorkers = BARISScenario.Instance.GetAvailableWorkers(isVAB);
+            // If there aren't enough workers, output is the maximum number of workers we have
+            // If output is 0 (or negative!) we might as well stop here.
+            newWorkers = Math.Min(BARISScenario.MaxWorkersPerBay - currentWorkers, availableWorkers);
+            if (newWorkers > 0)
+            {
+                // Update the number of workers we have left.
+                availableWorkers -= newWorkers;
+                BARISScenario.Instance.SetAvailableWorkers(availableWorkers, isVAB);
+                // Tell the subscribed delegates that we have useful data for them.
+                return true;
+            }
             return false;
         }
 

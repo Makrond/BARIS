@@ -15,7 +15,7 @@ Source code copyright 2018, by Michael Billard (Angel-125)
 License: GNU General Public License Version 3
 License URL: http://www.gnu.org/licenses/
 Wild Blue Industries is trademarked by Michael Billard and may be used for non-commercial purposes. All other rights reserved.
-Note that Wild Blue Industries is a ficticious entity 
+Note that Wild Blue Industries is a ficticious entity
 created for entertainment purposes. It is in no way meant to represent a real entity.
 Any similarity to a real entity is purely coincidental.
 
@@ -26,6 +26,7 @@ namespace WildBlueIndustries
     public delegate bool AddWorkerDelegate(int currentWorkers);
     public delegate bool RemoveWorkerDelegate(int currentWorkers);
     public delegate void ReturnWorkersDelegate(int workerCount);
+    public delegate bool MaxWorkersDelegate(int workerCount, out int newWorkers);
     public delegate void CloseViewDelegate();
 
     public class EditorBayView
@@ -39,6 +40,7 @@ namespace WildBlueIndustries
         public AddWorkerDelegate addWorker;
         public RemoveWorkerDelegate removeWorker;
         public ReturnWorkersDelegate returnWorkers;
+        public MaxWorkersDelegate maxWorkers;
         public CloseViewDelegate closeView;
 
         private Vector2 originPoint = new Vector2(0, 0);
@@ -362,7 +364,14 @@ namespace WildBlueIndustries
             //0 workers button
             if (GUILayout.Button("0", workerButtonOptions))
             {
-                editorBayItem.workerCount = 0;
+                // We already have a method to return all workers
+                if (returnWorkers != null)
+                {
+                    returnWorkers(editorBayItem.workerCount);
+                    editorBayItem.workerCount = 0;
+                    BARISScenario.Instance.SetEditorBay(editorBayItem);
+                    BARISScenario.Instance.SetKACAlarm(editorBayItem);
+                }
             }
 
             //Remove workers button
@@ -406,7 +415,21 @@ namespace WildBlueIndustries
             //Max button
             if (GUILayout.Button("MAX", workerButtonOptions))
             {
-                editorBayItem.workerCount = BARISScenario.MaxWorkersPerBay;
+                if (maxWorkers != null)
+                {
+                    if (maxWorkers(editorBayItem.workerCount, out int newWorkers))
+                    {
+                        editorBayItem.workerCount += newWorkers;
+                        BARISScenario.Instance.SetEditorBay(editorBayItem);
+                        BARISScenario.Instance.SetKACAlarm(editorBayItem);
+                    }
+                }
+                // This solution is probably overkill, but it replicates
+                // the functionality of the other delegates here. We could
+                // also pass in a reference to workerCount directly but
+                // that could lead to unwanted coupling.
+
+                //editorBayItem.workerCount = BARISScenario.MaxWorkersPerBay;
             }
             GUILayout.EndHorizontal();
             GUILayout.EndVertical();
