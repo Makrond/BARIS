@@ -18,7 +18,7 @@ License: GNU General Public License Version 3
 License URL: http://www.gnu.org/licenses/
 If you want to use this code, give me a shout on the KSP forums! :)
 Wild Blue Industries is trademarked by Michael Billard and may be used for non-commercial purposes. All other rights reserved.
-Note that Wild Blue Industries is a ficticious entity 
+Note that Wild Blue Industries is a ficticious entity
 created for entertainment purposes. It is in no way meant to represent a real entity.
 Any similarity to a real entity is purely coincidental.
 
@@ -1387,7 +1387,7 @@ namespace WildBlueIndustries
                 {
                     bayItem.Clear();
                 }
-            }            
+            }
         }
 
         /// <summary>
@@ -2458,10 +2458,6 @@ namespace WildBlueIndustries
             if (!KACWrapper.APIReady)
                 return;
 
-            //Delete the alarm if it exists
-            if (!string.IsNullOrEmpty(editorBayItem.KACAlarmID))
-                KACWrapper.KAC.DeleteAlarm(editorBayItem.KACAlarmID);
-
             //Get the start time
             double startTime = editorBayItem.integrationStartTime;
             if (startTime == 0)
@@ -2490,7 +2486,18 @@ namespace WildBlueIndustries
 
             //Now set the alarm
             buildTimeSeconds += Planetarium.GetUniversalTime();
-            editorBayItem.KACAlarmID = KACWrapper.KAC.CreateAlarm(KACWrapper.KACAPI.AlarmTypeEnum.Raw, editorBayItem.vesselName + BARISScenario.IntegrationCompletedKACAlarm, buildTimeSeconds);
+
+            //Get the alarm if it exists so we can update it
+            if (!string.IsNullOrEmpty(editorBayItem.KACAlarmID))
+            {
+                KACWrapper.KACAPI.KACAlarm alarm = KACWrapper.KAC.Alarms.First(z => z.ID == editorBayItem.KACAlarmID);
+                alarm.AlarmTime = buildTimeSeconds;
+                alarm.Name = editorBayItem.vesselName + IntegrationCompletedKACAlarm;
+            }
+            else
+            {
+                editorBayItem.KACAlarmID = KACWrapper.KAC.CreateAlarm(KACWrapper.KACAPI.AlarmTypeEnum.Raw, editorBayItem.vesselName + IntegrationCompletedKACAlarm, buildTimeSeconds);
+            }
         }
         #endregion
 
@@ -3146,7 +3153,7 @@ namespace WildBlueIndustries
             ProtoCrewMember astronaut = null;
             int skillRank = 0;
             int highestRank = 0;
-            
+
             //Find all the quality control modules, if any
             qualityModules = vessel.FindPartModulesImplementing<ModuleQualityControl>();
             if (qualityModules == null || qualityModules.Count == 0)
