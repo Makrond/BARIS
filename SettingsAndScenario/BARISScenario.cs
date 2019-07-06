@@ -1400,7 +1400,7 @@ namespace WildBlueIndustries
             //Deduct the worker payroll, If the player can't afford the worker payroll, then dismiss the workers.
             if (BARISSettingsLaunch.WorkersCostFunds)
             {
-                int totalWorkers = GetAvailableWorkers(true) + GetAvailableWorkers(false);
+                int totalWorkers = GetAllWorkers();
                 int totalWorkerCost = totalWorkers * PayrollPerWorker;
 
                 //If we can afford them then deduct their payroll
@@ -1519,6 +1519,14 @@ namespace WildBlueIndustries
             return workers;
         }
 
+        public int GetAllWorkers()
+        {
+            return availableSPHWorkers
+                   + availableVABWorkers
+                   + GetWorkersWorking(true)
+                   + GetWorkersWorking(false);
+        }
+
         public int GetMaxWorkers(bool isVAB)
         {
             if (isVAB)
@@ -1561,10 +1569,14 @@ namespace WildBlueIndustries
             //Get the max available workers
             int maxAvailableWorkers = GetMaxAvailableWorkers(isVAB);
 
-            //Set the new value
-            int workers = availableWorkers;
-            if (workers > maxAvailableWorkers)
-                workers = maxAvailableWorkers;
+            int workers = 0;
+
+            if (availableWorkers >= 0)
+            {
+                //Set the new value
+                workers = Math.Min(availableWorkers, maxAvailableWorkers);
+            }
+
 
             if (isVAB)
                 availableVABWorkers = workers;

@@ -15,7 +15,7 @@ Source code copyright 2018, by Michael Billard (Angel-125)
 License: GNU General Public License Version 3
 License URL: http://www.gnu.org/licenses/
 Wild Blue Industries is trademarked by Michael Billard and may be used for non-commercial purposes. All other rights reserved.
-Note that Wild Blue Industries is a ficticious entity 
+Note that Wild Blue Industries is a ficticious entity
 created for entertainment purposes. It is in no way meant to represent a real entity.
 Any similarity to a real entity is purely coincidental.
 
@@ -128,7 +128,7 @@ namespace WildBlueIndustries
             //Max workers button
             if (GUILayout.Button("MAX"))
             {
-                BARISScenario.Instance.SetAvailableWorkers(maxAvailableWorkers, true);
+                BARISScenario.Instance.SetAvailableWorkers(maxAvailableWorkers - workersWorking, true);
             }
 
             GUILayout.EndHorizontal();
@@ -189,7 +189,7 @@ namespace WildBlueIndustries
             //Max workers button
             if (GUILayout.Button("MAX"))
             {
-                BARISScenario.Instance.SetAvailableWorkers(maxAvailableWorkers, false);
+                BARISScenario.Instance.SetAvailableWorkers(maxAvailableWorkers - workersWorking, false);
             }
 
             GUILayout.EndHorizontal();
@@ -208,7 +208,7 @@ namespace WildBlueIndustries
 
         protected void drawPayroll()
         {
-            int workerCost = BARISScenario.Instance.GetAvailableWorkers(true) + BARISScenario.Instance.GetAvailableWorkers(false);
+            int workerCost = BARISScenario.Instance.GetAllWorkers();
             workerCost *= BARISScenario.PayrollPerWorker;
             int astronautCost = getActiveDutyAstronauts();
             astronautCost *= BARISScenario.PayrollPerAstronaut;
