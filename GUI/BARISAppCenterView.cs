@@ -153,7 +153,7 @@ namespace WildBlueIndustries
             if (GUILayout.Button("0"))
             {
                 availableWorkers = 0;
-                BARISScenario.Instance.SetAvailableWorkers(availableWorkers, true);
+                BARISScenario.Instance.SetAvailableWorkers(availableWorkers, false);
             }
 
             //Remove workers button
